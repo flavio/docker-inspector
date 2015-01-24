@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require_relative('../lib/inspector')
+Inspector::Cli.start(ARGV)

@@ -1,0 +1,13 @@
+require 'json'
+require 'filesize'
+require 'set'
+require 'shellwords'
+require 'tempfile'
+require 'thor'
+
+require_relative 'inspector/cli'
+require_relative 'inspector/helpers'
+require_relative 'inspector/image'
+require_relative 'inspector/layer'
+require_relative 'inspector/tag'
+require_relative 'inspector/version'
