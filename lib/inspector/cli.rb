@@ -21,7 +21,6 @@ module Inspector
     end
 
     desc "details IMAGE", "Details about IMAGE"
-    method_option :full_id, :type => :boolean, :default => false, :required => false
     def details(image_name)
       ensure_root()
       images = Inspector.parse_images()
@@ -44,7 +43,17 @@ module Inspector
 
       puts "This image is made by #{tag.layers.count} layers:"
       tag.layers.each do |l|
-        puts l.to_s(options[:full_id])
+        puts l
+      end
+    end
+
+    desc "layers", "List all the available layers"
+    def layers
+      ensure_root()
+      Inspector.parse_images()
+
+      LayerRegistry.instance.layers.each do |l|
+        puts l
       end
     end
 
@@ -76,7 +85,7 @@ module Inspector
         end
       end
 
-      tag_labels = Hash.new {|h,k| h[k] = []}
+      tag_labels = Hash.new {|h,k| h[k] = Set.new()}
       relations = Set.new()
       output_file = "docker_inspector.png"
       tmpfile = Tempfile.new("docker_inspector")
@@ -89,11 +98,13 @@ module Inspector
         relations << layers.map{|l| "\"#{l.short_id}\""}.join(" -> ") + "\n"
 
         # write labels for tagged layers
-        layers.find_all{|l| l.tag}.each do |tl|
-          tag_labels[tl.short_id] << {
-            :image_name => tl.tag.image.name,
-            :tag_name   => tl.tag.name
-          }
+        layers.reject{|l| l.tags.empty?}.each do |tl|
+          tl.tags.each do |tag|
+            tag_labels[tl.short_id] << {
+              :image_name => tag.image.name,
+              :tag_name   => tag.name
+            }
+          end
         end
       end
 

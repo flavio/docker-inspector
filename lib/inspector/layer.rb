@@ -2,12 +2,14 @@ module Inspector
 
   class Layer
 
-    attr_reader :layer_id, :size, :tag
+    attr_reader :layer_id, :size, :tags
+    attr_accessor :parent
 
     def initialize(layer_id, size)
       @layer_id = layer_id
       @size = size.to_i
-      @tag = nil
+      @tags = Set.new()
+      @parent = nil
     end
 
     def short_id
@@ -15,17 +17,19 @@ module Inspector
     end
 
     def associate_tag(tag)
-      @tag = tag
+      @tags << tag
     end
 
-    def to_s(full_id=false)
-      msg = ""
-      if full_id
-        msg += @layer_id
+    def ancestors
+      if @parent
+        @parent.ancestors << self
       else
-        msg += short_id
+        [self]
       end
-      msg + " [#{Filesize.from("#{@size} B").pretty}]\n"
+    end
+
+    def to_s
+      "#{@layer_id} [#{Filesize.from("#{@size} B").pretty}]"
     end
 
   end

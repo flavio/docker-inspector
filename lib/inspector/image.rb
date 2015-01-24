@@ -23,12 +23,9 @@ module Inspector
     end
 
     def to_s
-      ret = ""
-      @tags.each do |tag|
-        ret += "#{@name}:#{tag.name}\n"
-      end
-
-      ret
+      @tags.map do |tag|
+        "#{@name}:#{tag.name}"
+      end.join("\n")
     end
 
   end
