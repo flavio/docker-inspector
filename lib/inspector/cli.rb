@@ -21,6 +21,7 @@ module Inspector
     end
 
     desc "details IMAGE", "Details about IMAGE"
+    method_option :full_id, :type => :boolean, :default => false, :required => false
     def details(image_name)
       ensure_root()
       images = Inspector.parse_images()
@@ -41,8 +42,9 @@ module Inspector
         exit(1)
       end
 
+      puts "This image is made by #{tag.layers.count} layers:"
       tag.layers.each do |l|
-        puts l
+        puts l.to_s(options[:full_id])
       end
     end
 

@@ -18,8 +18,14 @@ module Inspector
       @tag = tag
     end
 
-    def to_s
-      "#{short_id} [#{Filesize.from("#{@size} B").pretty}]\n"
+    def to_s(full_id=false)
+      msg = ""
+      if full_id
+        msg += @layer_id
+      else
+        msg += short_id
+      end
+      msg + " [#{Filesize.from("#{@size} B").pretty}]\n"
     end
 
   end
