@@ -7,6 +7,8 @@ require 'tempfile'
 require 'thor'
 
 require_relative 'inspector/cli'
+require_relative "inspector/container"
+require_relative 'inspector/exceptions'
 require_relative 'inspector/helpers'
 require_relative 'inspector/image'
 require_relative 'inspector/layer'

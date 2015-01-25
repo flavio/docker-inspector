@@ -15,7 +15,7 @@ module Inspector
 
       layer_dir = "/var/lib/docker/graph/#{layer_id}"
       if !File.exists?(layer_dir)
-        raise "Cannot find layer #{layer_id}"
+        raise LayerNotFound.new("Cannot find layer #{layer_id}")
       end
       data = JSON.parse(File.read(File.join(layer_dir, "json")))
       size = File.read(File.join(layer_dir, "layersize"))
@@ -31,6 +31,10 @@ module Inspector
 
     def layers
       @layers.values
+    end
+
+    def layer(layer_id)
+      @layers[layer_id]
     end
 
   end

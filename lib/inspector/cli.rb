@@ -1,35 +1,15 @@
 module Inspector
-
-  # This is the public facing command line interface which is available through
-  # the +dister+ command line tool. Use +dister --help+ for usage instructions.
-  class Cli < Thor
-
-    include Thor::Actions
-
-    desc "version", "Show dister version"
-    def version
-      puts Inspector::VERSION
-    end
-
-    desc "images", "List the available images"
-    def images
-      ensure_root()
-      images = Inspector.parse_images()
-      images.values.each do |image|
-        puts image
-      end
-    end
-
-    desc "details IMAGE", "Details about IMAGE"
-    def details(image_name)
-      ensure_root()
+  class Details < Thor
+    desc "image IMAGE", "Details about IMAGE"
+    def image(image_name)
+      Inspector.ensure_root()
       images = Inspector.parse_images()
 
       name, tag = image_name.split(":", 2)
       tag ||= "latest"
 
       if !images.has_key?(name)
-        warn "Cannot find #{image_name}"
+        warn "Cannot find image #{image_name}"
         exit(1)
       end
 
@@ -37,7 +17,7 @@ module Inspector
       tag = image.tag(tag)
 
       if !tag
-        warn "Cannot find #{image_name}"
+        warn "Cannot find image #{image_name}"
         exit(1)
       end
 
@@ -47,9 +27,50 @@ module Inspector
       end
     end
 
+    desc "container CONTAINER_ID", "Details about a container"
+    def container(container_id)
+      Inspector.ensure_root()
+
+      containers = Inspector.parse_images
+      containers = Inspector.parse_containers
+      container = containers[container_id]
+      if !container
+        warn "Cannot find container #{container_id}"
+        exit(1)
+      end
+
+      puts container
+      puts JSON.pretty_generate(container.data)
+    end
+
+  end
+
+  # This is the public facing command line interface which is available through
+  # the +dister+ command line tool. Use +dister --help+ for usage instructions.
+  class Cli < Thor
+    # include Thor::Actions
+
+    desc "version", "Show dister version"
+    def version
+      puts Inspector::VERSION
+    end
+
+    desc "images", "List the available images"
+    def images
+      Inspector.ensure_root()
+      images = Inspector.parse_images()
+      images.values.each do |image|
+        puts image
+      end
+    end
+
+    desc "details SUBCOMMAND ...ARGS", "Provide more details"
+    subcommand "details", Details
+
+
     desc "layers", "List all the available layers"
     def layers
-      ensure_root()
+      Inspector.ensure_root()
       Inspector.parse_images()
 
       LayerRegistry.instance.layers.each do |l|
@@ -59,7 +80,7 @@ module Inspector
 
     desc "dot [IMAGE...]", "Create dot graph for the image specified or for all the images if no name is provided"
     def dot(*image_names)
-      ensure_root()
+      Inspector.ensure_root()
       images = Inspector.parse_images()
       tags_to_process = []
 
@@ -137,12 +158,12 @@ module Inspector
       end
     end
 
-    no_commands do
-      def ensure_root
-        if Process.uid != 0
-          warn "root user required"
-          exit(1)
-        end
+    desc "containers", "List all the available containers"
+    def containers
+      # Required to load details about layers and images
+      Inspector.parse_images
+      Inspector.parse_containers.values.each do |container|
+        puts container
       end
     end
 
