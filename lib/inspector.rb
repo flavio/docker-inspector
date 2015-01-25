@@ -4,6 +4,7 @@ require 'set'
 require 'singleton'
 require 'shellwords'
 require 'tempfile'
+require 'terminal-table'
 require 'thor'
 
 require_relative 'inspector/cli'

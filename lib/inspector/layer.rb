@@ -2,14 +2,15 @@ module Inspector
 
   class Layer
 
-    attr_reader :layer_id, :size, :tags
+    attr_reader :layer_id, :size, :tags, :data
     attr_accessor :parent
 
-    def initialize(layer_id, size)
+    def initialize(layer_id, size, data)
       @layer_id = layer_id
-      @size = size.to_i
-      @tags = Set.new()
-      @parent = nil
+      @data     = data
+      @size     = size.to_i
+      @tags     = Set.new()
+      @parent   = nil
     end
 
     def short_id
@@ -30,6 +31,19 @@ module Inspector
 
     def to_s
       "#{@layer_id} [#{Filesize.from("#{@size} B").pretty}]"
+    end
+
+    def to_row
+      tags = @tags.map{|t| "#{t.image.name}:#{t.name}"}.join(", ")
+      if tags.empty?
+        tags = "-"
+      end
+      [
+        @layer_id,
+        Filesize.from("#{@size} B").pretty,
+        tags,
+        @data['created']
+      ]
     end
 
   end

@@ -19,7 +19,7 @@ module Inspector
       end
       data = JSON.parse(File.read(File.join(layer_dir, "json")))
       size = File.read(File.join(layer_dir, "layersize"))
-      layer = Layer.new(layer_id, size)
+      layer = Layer.new(layer_id, size, data)
       layer.associate_tag(tag) if tag
       @layers[layer_id] = layer
       if data["parent"]

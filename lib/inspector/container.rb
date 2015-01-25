@@ -15,6 +15,10 @@ module Inspector
       end
     end
 
+    def short_id
+      @container_id[0,6]
+    end
+
     def to_s
       msg = "#{@container_id} created on #{@data['Created']}, Size #{Filesize.from("#{@size} B")}, "
       if @tags.empty?
@@ -24,6 +28,19 @@ module Inspector
         msg += @tags.map{|t| "#{t.image.name}:#{t.name}"}.join(", ")
         msg += "\n"
       end
+    end
+
+    def to_row
+      base_image = "unknown"
+      if !@tags.empty?
+        base_image = @tags.map{|t| "#{t.image.name}:#{t.name}"}.join(", ")
+      end
+      [
+        @container_id,
+        @data['Created'],
+        Filesize.from("#{@size} B"),
+        base_image
+      ]
     end
 
   end

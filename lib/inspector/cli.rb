@@ -22,9 +22,13 @@ module Inspector
       end
 
       puts "This image is made by #{tag.layers.count} layers:"
-      tag.layers.each do |l|
-        puts l
+      table = Terminal::Table.new do |t|
+        t.headings = ["Number", "ID", "Size", "Tags", "Created"]
+        tag.layers.each_with_index do |l, index|
+          t.add_row([index + 1 ] + l.to_row)
+        end
       end
+      puts table
     end
 
     desc "container CONTAINER_ID", "Details about a container"
@@ -73,9 +77,13 @@ module Inspector
       Inspector.ensure_root()
       Inspector.parse_images()
 
-      LayerRegistry.instance.layers.each do |l|
-        puts l
+      table = Terminal::Table.new do |t|
+        t.headings = ["ID", "Size", "Tags", "Created"]
+        LayerRegistry.instance.layers.each do |l|
+            t.add_row(l.to_row)
+        end
       end
+      puts table
     end
 
     desc "dot [IMAGE...]", "Create dot graph for the image specified or for all the images if no name is provided"
@@ -162,9 +170,15 @@ module Inspector
     def containers
       # Required to load details about layers and images
       Inspector.parse_images
-      Inspector.parse_containers.values.each do |container|
-        puts container
+
+      table = Terminal::Table.new do |t|
+        t.headings = ["ID", "Created", "Size", "Based on"]
+        Inspector.parse_containers.values.each do |container|
+          t.add_row(container.to_row)
+        end
       end
+      puts table
+
     end
 
   end
